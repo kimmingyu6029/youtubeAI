@@ -147,6 +147,14 @@ GEMINI_API_KEY=your_real_gemini_api_key
 YOUTUBE_CHANNEL_ID=your_real_youtube_channel_id
 ```
 
+여러 유튜버를 감시하려면 `YOUTUBE_CHANNEL_IDS`에 채널 ID를 쉼표로 구분해서 넣습니다.
+
+```env
+YOUTUBE_CHANNEL_IDS=UC첫번째채널ID,UC두번째채널ID,UC세번째채널ID
+```
+
+`YOUTUBE_CHANNEL_IDS`가 있으면 여러 채널을 확인하고, 없으면 기존 `YOUTUBE_CHANNEL_ID` 하나만 확인합니다.
+
 `.env.example`에는 예시 값만 두고, 실제 키는 절대 넣지 마세요.
 
 ## VSCode 터미널에서 실행하는 방법
@@ -239,6 +247,7 @@ NOTION_TOKEN
 NOTION_DATABASE_ID
 GEMINI_API_KEY
 YOUTUBE_CHANNEL_ID
+YOUTUBE_CHANNEL_IDS
 ```
 
 선택 값:
@@ -292,6 +301,7 @@ NOTION_TOKEN
 NOTION_DATABASE_ID
 GEMINI_API_KEY
 YOUTUBE_CHANNEL_ID
+YOUTUBE_CHANNEL_IDS
 ```
 
 ### Notion DB 컬럼명이 맞지 않습니다
@@ -317,7 +327,7 @@ README의 컬럼명과 Notion DB 속성명을 다시 확인하세요.
 
 ### YouTube RSS에서 영상을 가져오지 못합니다
 
-아래처럼 출력되면 `YOUTUBE_CHANNEL_ID` 값을 확인하세요.
+아래처럼 출력되면 `YOUTUBE_CHANNEL_ID` 또는 `YOUTUBE_CHANNEL_IDS` 값을 확인하세요.
 
 ```text
 [ERROR] YouTube RSS에서 영상을 가져오지 못했습니다.
@@ -325,6 +335,12 @@ YOUTUBE_CHANNEL_ID가 올바른지 확인하세요.
 ```
 
 YouTube 핸들 주소나 커스텀 URL이 아니라 `UC...`로 시작하는 채널 ID가 필요합니다.
+
+여러 채널을 감시할 때는 쉼표로 구분합니다.
+
+```env
+YOUTUBE_CHANNEL_IDS=UC첫번째채널ID,UC두번째채널ID
+```
 
 RSS URL 형식:
 

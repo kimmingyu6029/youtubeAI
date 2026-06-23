@@ -13,7 +13,6 @@ REQUIRED_ENV_VARS = (
     "NOTION_TOKEN",
     "NOTION_DATABASE_ID",
     "GEMINI_API_KEY",
-    "YOUTUBE_CHANNEL_ID",
 )
 
 
@@ -23,6 +22,7 @@ class AppConfig:
     notion_database_id: str
     gemini_api_key: str
     youtube_channel_id: str
+    youtube_channel_ids: tuple[str, ...]
     gemini_model: str
     notion_version: str
 
@@ -32,6 +32,10 @@ def load_config() -> AppConfig:
     load_dotenv()
 
     missing_vars = [name for name in REQUIRED_ENV_VARS if not os.getenv(name)]
+    youtube_channel_ids = parse_youtube_channel_ids()
+    if not youtube_channel_ids:
+        missing_vars.append("YOUTUBE_CHANNEL_ID 또는 YOUTUBE_CHANNEL_IDS")
+
     if missing_vars:
         for name in missing_vars:
             print(f"[ERROR] {name}이 설정되지 않았습니다.")
@@ -42,11 +46,28 @@ def load_config() -> AppConfig:
         notion_token=os.getenv("NOTION_TOKEN", ""),
         notion_database_id=os.getenv("NOTION_DATABASE_ID", ""),
         gemini_api_key=os.getenv("GEMINI_API_KEY", ""),
-        youtube_channel_id=os.getenv("YOUTUBE_CHANNEL_ID", ""),
+        youtube_channel_id=youtube_channel_ids[0],
+        youtube_channel_ids=tuple(youtube_channel_ids),
         gemini_model=os.getenv("GEMINI_MODEL") or "gemini-2.5-flash",
         # 데이터베이스 엔드포인트를 쓰기 위해 안정적으로 동작하는 Notion API 버전을 사용합니다.
         notion_version=os.getenv("NOTION_VERSION") or "2022-06-28",
     )
+
+
+def parse_youtube_channel_ids() -> list[str]:
+    """YOUTUBE_CHANNEL_IDS 또는 기존 YOUTUBE_CHANNEL_ID에서 채널 ID 목록을 읽습니다."""
+    raw_channel_ids = os.getenv("YOUTUBE_CHANNEL_IDS") or os.getenv("YOUTUBE_CHANNEL_ID") or ""
+    channel_ids = []
+    seen = set()
+
+    for raw_channel_id in raw_channel_ids.replace("\n", ",").split(","):
+        channel_id = raw_channel_id.strip()
+        if not channel_id or channel_id in seen:
+            continue
+        channel_ids.append(channel_id)
+        seen.add(channel_id)
+
+    return channel_ids
 
 
 def require_env(name: str) -> str:
