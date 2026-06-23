@@ -155,6 +155,14 @@ YOUTUBE_CHANNEL_IDS=UC첫번째채널ID,UC두번째채널ID,UC세번째채널ID
 
 `YOUTUBE_CHANNEL_IDS`가 있으면 여러 채널을 확인하고, 없으면 기존 `YOUTUBE_CHANNEL_ID` 하나만 확인합니다.
 
+각 채널에서 RSS 최신 몇 개까지 확인할지도 정할 수 있습니다. 기본값은 `5`입니다.
+
+```env
+YOUTUBE_MAX_VIDEOS_PER_CHANNEL=5
+```
+
+예를 들어 한 유튜버가 10분 사이에 영상 2개를 올려도, RSS 최신 5개 안에 있으면 아직 저장되지 않은 영상은 모두 저장합니다.
+
 `.env.example`에는 예시 값만 두고, 실제 키는 절대 넣지 마세요.
 
 ## VSCode 터미널에서 실행하는 방법
@@ -248,6 +256,7 @@ NOTION_DATABASE_ID
 GEMINI_API_KEY
 YOUTUBE_CHANNEL_ID
 YOUTUBE_CHANNEL_IDS
+YOUTUBE_MAX_VIDEOS_PER_CHANNEL
 ```
 
 선택 값:
@@ -302,6 +311,7 @@ NOTION_DATABASE_ID
 GEMINI_API_KEY
 YOUTUBE_CHANNEL_ID
 YOUTUBE_CHANNEL_IDS
+YOUTUBE_MAX_VIDEOS_PER_CHANNEL
 ```
 
 ### Notion DB 컬럼명이 맞지 않습니다

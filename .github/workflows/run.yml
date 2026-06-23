@@ -34,5 +34,6 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
           YOUTUBE_CHANNEL_IDS: ${{ secrets.YOUTUBE_CHANNEL_IDS }}
+          YOUTUBE_MAX_VIDEOS_PER_CHANNEL: ${{ secrets.YOUTUBE_MAX_VIDEOS_PER_CHANNEL }}
           GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
         run: python main.py

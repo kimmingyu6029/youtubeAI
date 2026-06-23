@@ -49,6 +49,12 @@ def _extract_video_id(entry: Any) -> str:
 
 def fetch_latest_video(channel_id: str) -> dict[str, str] | None:
     """RSS에서 최신 영상 1개를 가져와 dict로 반환합니다."""
+    videos = fetch_latest_videos(channel_id=channel_id, max_videos=1)
+    return videos[0] if videos else None
+
+
+def fetch_latest_videos(channel_id: str, max_videos: int = 5) -> list[dict[str, str]]:
+    """RSS에서 최신 영상 여러 개를 가져와 dict 목록으로 반환합니다."""
     rss_url = build_rss_url(channel_id)
     print(f"[rss] YouTube RSS 요청: {rss_url}")
 
@@ -64,32 +70,39 @@ def fetch_latest_video(channel_id: str) -> dict[str, str] | None:
 
         if not feed.entries:
             _print_rss_fetch_error("RSS에 영상 항목이 없습니다.")
-            return None
+            return []
 
-        latest_entry = feed.entries[0]
-        video_id = _extract_video_id(latest_entry)
-        if not video_id:
-            raise RuntimeError("최신 영상의 video_id를 찾지 못했습니다.")
+        videos = []
+        for entry in feed.entries[:max_videos]:
+            video_id = _extract_video_id(entry)
+            if not video_id:
+                print("[rss] video_id를 찾지 못한 RSS 항목은 건너뜁니다.")
+                continue
 
-        video = {
-            "video_id": video_id,
-            "title": _entry_value(latest_entry, "title", "제목 없음"),
-            "url": _entry_value(
-                latest_entry,
-                "link",
-                f"https://www.youtube.com/watch?v={video_id}",
-            ),
-            "published_at": _published_at_to_iso(latest_entry),
-            "channel_name": _entry_value(latest_entry, "author")
-            or _entry_value(feed.feed, "title", "채널명 없음"),
-        }
+            videos.append(
+                {
+                    "video_id": video_id,
+                    "title": _entry_value(entry, "title", "제목 없음"),
+                    "url": _entry_value(
+                        entry,
+                        "link",
+                        f"https://www.youtube.com/watch?v={video_id}",
+                    ),
+                    "published_at": _published_at_to_iso(entry),
+                    "channel_name": _entry_value(entry, "author")
+                    or _entry_value(feed.feed, "title", "채널명 없음"),
+                }
+            )
 
-        print("[rss] 최신 영상 정보를 가져왔습니다.")
-        return video
+        if not videos:
+            raise RuntimeError("RSS 항목에서 video_id를 찾지 못했습니다.")
+
+        print(f"[rss] 최신 영상 {len(videos)}개 정보를 가져왔습니다.")
+        return videos
 
     except Exception as error:
         _print_rss_fetch_error(str(error))
-        return None
+        return []
 
 
 def _print_rss_fetch_error(detail: str = "") -> None:

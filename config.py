@@ -23,6 +23,7 @@ class AppConfig:
     gemini_api_key: str
     youtube_channel_id: str
     youtube_channel_ids: tuple[str, ...]
+    youtube_max_videos_per_channel: int
     gemini_model: str
     notion_version: str
 
@@ -48,6 +49,10 @@ def load_config() -> AppConfig:
         gemini_api_key=os.getenv("GEMINI_API_KEY", ""),
         youtube_channel_id=youtube_channel_ids[0],
         youtube_channel_ids=tuple(youtube_channel_ids),
+        youtube_max_videos_per_channel=parse_positive_int(
+            "YOUTUBE_MAX_VIDEOS_PER_CHANNEL",
+            default=5,
+        ),
         gemini_model=os.getenv("GEMINI_MODEL") or "gemini-2.5-flash",
         # 데이터베이스 엔드포인트를 쓰기 위해 안정적으로 동작하는 Notion API 버전을 사용합니다.
         notion_version=os.getenv("NOTION_VERSION") or "2022-06-28",
@@ -68,6 +73,25 @@ def parse_youtube_channel_ids() -> list[str]:
         seen.add(channel_id)
 
     return channel_ids
+
+
+def parse_positive_int(name: str, default: int) -> int:
+    """양의 정수 환경변수를 읽고, 없거나 잘못되면 기본값을 사용합니다."""
+    raw_value = os.getenv(name)
+    if not raw_value:
+        return default
+
+    try:
+        value = int(raw_value)
+    except ValueError:
+        print(f"[config] {name} 값이 숫자가 아니어서 기본값 {default}를 사용합니다.")
+        return default
+
+    if value < 1:
+        print(f"[config] {name} 값은 1 이상이어야 해서 기본값 {default}를 사용합니다.")
+        return default
+
+    return value
 
 
 def require_env(name: str) -> str:
